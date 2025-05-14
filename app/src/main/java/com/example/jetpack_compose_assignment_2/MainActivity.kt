@@ -1,5 +1,6 @@
 package com.example.jetpack_compose_assignment_2
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -11,37 +12,34 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.jetpack_compose_assignment_2.data.local.Tododatabase
+import com.example.jetpack_compose_assignment_2.data.remote.RetrofitInstance
+import com.example.jetpack_compose_assignment_2.domain.repository.TodoRepositoryImpl
 import com.example.jetpack_compose_assignment_2.ui.theme.Jetpackcomposeassignment2Theme
+import com.example.todoapp.presentation.navigation.AppNavGraph
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        val database = Tododatabase.getInstance(applicationContext)
+        val dao = database.todoDao()
+        val repository = TodoRepositoryImpl(api = RetrofitInstance.api, dao = dao)
         setContent {
             Jetpackcomposeassignment2Theme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
+                    AppNavGraph(repository = repository)
                 }
             }
         }
     }
 }
 
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
+
 
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
     Jetpackcomposeassignment2Theme {
-        Greeting("Android")
+
     }
 }
