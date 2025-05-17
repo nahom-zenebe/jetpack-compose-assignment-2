@@ -19,6 +19,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.jetpack_compose_assignment_2.domain.Todo
 import com.example.jetpack_compose_assignment_2.domain.repository.TodoRepository
+import com.example.jetpack_compose_assignment_2.presentation.component.TodoItem
 import com.example.todoapp.presentation.detail.TodoDetailViewModel
 
 
@@ -34,7 +35,8 @@ class TodoDetailViewModelFactory(
     }
 }
 
-// presentation/list/TodoListScreen.kt
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TodoListScreen(
     viewModel: TodoListViewModel,
@@ -43,17 +45,36 @@ fun TodoListScreen(
     val state by viewModel.state.collectAsState()
 
     Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text("Todo List", style = MaterialTheme.typography.titleLarge)
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary
+                )
+            )
+        },
         floatingActionButton = {
-            FloatingActionButton(onClick = { viewModel.loadTodos() }) {
-                Icon(Icons.Default.Refresh, contentDescription = "Refresh")
+            FloatingActionButton(
+                onClick = { viewModel.loadTodos() },
+                containerColor = MaterialTheme.colorScheme.primary
+            ) {
+                Icon(Icons.Default.Refresh, contentDescription = "Refresh", tint = MaterialTheme.colorScheme.onPrimary)
             }
-        }
+        },
+        containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
-        Box(modifier = Modifier.padding(padding)) {
+        Box(modifier = Modifier
+            .fillMaxSize()
+            .padding(padding)
+            .padding(horizontal = 12.dp)
+        ) {
             when (val currentState = state) {
                 is TodoListState.Loading -> {
-                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator()
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
                     }
                 }
                 is TodoListState.Error -> {
@@ -62,14 +83,18 @@ fun TodoListScreen(
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Text(currentState.message)
+                        Text(currentState.message, color = MaterialTheme.colorScheme.error)
+                        Spacer(modifier = Modifier.height(12.dp))
                         Button(onClick = { viewModel.loadTodos() }) {
                             Text("Retry")
                         }
                     }
                 }
                 is TodoListState.Success -> {
-                    LazyColumn {
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        contentPadding = PaddingValues(vertical = 12.dp)
+                    ) {
                         items(currentState.todos) { todo ->
                             TodoItem(
                                 todo = todo,
@@ -83,34 +108,3 @@ fun TodoListScreen(
     }
 }
 
-@Composable
-fun TodoItem(todo: Todo, onClick: () -> Unit) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp)
-            .clickable(onClick = onClick),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
-    ) {
-        Row(
-            modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Checkbox(
-                checked = todo.completed,
-                onCheckedChange = null
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Column(modifier = Modifier.weight(1f)) {
-                Text(
-                    text = todo.title,
-                    style = MaterialTheme.typography.titleMedium
-                )
-                Text(
-                    text = if (todo.completed) "Completed" else "Pending",
-                    style = MaterialTheme.typography.bodySmall
-                )
-            }
-        }
-    }
-}
