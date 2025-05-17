@@ -23,17 +23,21 @@ class TodoListViewModel(
     val state: StateFlow<TodoListState> = _state
 
     init {
-        fetchTodos()
+        loadTodos()
     }
 
-    private fun fetchTodos() {
+    fun loadTodos() {
         viewModelScope.launch {
+            _state.value = TodoListState.Loading
             try {
+                repository.refreshTodos()
                 repository.getTodos().collect { todos ->
                     _state.value = TodoListState.Success(todos)
                 }
             } catch (e: Exception) {
-                _state.value = TodoListState.Error("Failed to load todos")
+                _state.value = TodoListState.Error(
+                    "Error: ${e.message ?: "Unknown error"}"
+                )
             }
         }
     }

@@ -22,9 +22,13 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-        val database = TodoDatabase.getInstance(applicationContext)
-        val dao = database.todoDao()
-        val repository = TodoRepositoryImpl(api = RetrofitInstance.api, dao = dao)
+        val repository by lazy {
+            val database = TodoDatabase.getInstance(applicationContext)
+            TodoRepositoryImpl(
+                api = RetrofitInstance.api,
+                dao = database.todoDao()
+            )
+        }
         setContent {
             Jetpackcomposeassignment2Theme {
                     AppNavGraph(repository = repository)

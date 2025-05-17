@@ -4,6 +4,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -32,7 +34,7 @@ class TodoDetailViewModelFactory(
     }
 }
 
-
+// presentation/list/TodoListScreen.kt
 @Composable
 fun TodoListScreen(
     viewModel: TodoListViewModel,
@@ -40,24 +42,40 @@ fun TodoListScreen(
 ) {
     val state by viewModel.state.collectAsState()
 
-    when (state) {
-        is TodoListState.Loading -> {
-            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator()
+    Scaffold(
+        floatingActionButton = {
+            FloatingActionButton(onClick = { viewModel.loadTodos() }) {
+                Icon(Icons.Default.Refresh, contentDescription = "Refresh")
             }
         }
-
-        is TodoListState.Error -> {
-            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text(text = (state as TodoListState.Error).message)
-            }
-        }
-
-        is TodoListState.Success -> {
-            LazyColumn(modifier = Modifier.padding(16.dp)) {
-                items((state as TodoListState.Success).todos) { todo ->
-                    TodoItem(todo = todo) {
-                        onTodoClick(todo.id)
+    ) { padding ->
+        Box(modifier = Modifier.padding(padding)) {
+            when (val currentState = state) {
+                is TodoListState.Loading -> {
+                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator()
+                    }
+                }
+                is TodoListState.Error -> {
+                    Column(
+                        modifier = Modifier.fillMaxSize(),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(currentState.message)
+                        Button(onClick = { viewModel.loadTodos() }) {
+                            Text("Retry")
+                        }
+                    }
+                }
+                is TodoListState.Success -> {
+                    LazyColumn {
+                        items(currentState.todos) { todo ->
+                            TodoItem(
+                                todo = todo,
+                                onClick = { onTodoClick(todo.id) }
+                            )
+                        }
                     }
                 }
             }
@@ -71,12 +89,28 @@ fun TodoItem(todo: Todo, onClick: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(8.dp)
-            .clickable { onClick() },
+            .clickable(onClick = onClick),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(todo.title, style = MaterialTheme.typography.titleMedium)
-            Text(if (todo.completed) " Completed" else " Not Completed")
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Checkbox(
+                checked = todo.completed,
+                onCheckedChange = null
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = todo.title,
+                    style = MaterialTheme.typography.titleMedium
+                )
+                Text(
+                    text = if (todo.completed) "Completed" else "Pending",
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
         }
     }
 }
