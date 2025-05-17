@@ -1,6 +1,5 @@
 package com.example.todoapp.data.mapper
-
-import TodoEntity
+import com.example.jetpack_compose_assignment_2.data.local.TodoEntity
 import com.example.jetpack_compose_assignment_2.domain.Todo
 
 

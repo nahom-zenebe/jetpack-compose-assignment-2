@@ -1,10 +1,16 @@
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.Modifier
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -18,7 +24,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.jetpack_compose_assignment_2.domain.repository.TodoRepository
 import com.example.todoapp.presentation.detail.TodoDetailViewModel
-import java.lang.reflect.Modifier
+
 
 
 class TodoDetailViewModelFactory(
@@ -64,7 +70,7 @@ fun TodoDetailScreen(
                 Column(modifier = Modifier.padding(16.dp)) {
                     Text("ID: ${it.id}")
                     Text("Title: ${it.title}", style = MaterialTheme.typography.titleLarge)
-                    Text("Status: ${if (it.completed) " Completed" else "❌ Not Completed"}")
+                    Text("Status: ${if (it.completed) " Completed" else " Not Completed"}")
                     Text("User ID: ${it.userId}")
                 }
             } ?: Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
