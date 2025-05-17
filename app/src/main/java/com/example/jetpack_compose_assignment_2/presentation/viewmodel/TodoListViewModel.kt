@@ -30,15 +30,26 @@ class TodoListViewModel(
         viewModelScope.launch {
             _state.value = TodoListState.Loading
             try {
+                // Try to fetch from network and update cache
                 repository.refreshTodos()
+            } catch (e: Exception) {
+                // Log error and fallback to cached data
+                _state.value = TodoListState.Error(" ${e.message ?: "Unknown error"} — showing cached data if available")
+            }
+
+            // Collect cached data regardless of network result
+            try {
                 repository.getTodos().collect { todos ->
-                    _state.value = TodoListState.Success(todos)
+                    if (todos.isNotEmpty()) {
+                        _state.value = TodoListState.Success(todos)
+                    } else {
+                        _state.value = TodoListState.Error("No todos found in local cache.")
+                    }
                 }
             } catch (e: Exception) {
-                _state.value = TodoListState.Error(
-                    "Error: ${e.message ?: "Unknown error"}"
-                )
+                _state.value = TodoListState.Error("Failed to load data from cache: ${e.message ?: "Unknown error"}")
             }
         }
     }
 }
+
