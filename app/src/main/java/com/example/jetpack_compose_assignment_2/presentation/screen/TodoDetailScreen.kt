@@ -48,17 +48,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.draw.clip
 
 
-class TodoDetailViewModelFactory(
-    private val repository: TodoRepository
-) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(TodoDetailViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return TodoDetailViewModel(repository) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
-    }
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

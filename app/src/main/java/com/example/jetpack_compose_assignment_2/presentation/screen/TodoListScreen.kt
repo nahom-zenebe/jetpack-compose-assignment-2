@@ -23,17 +23,7 @@ import com.example.jetpack_compose_assignment_2.presentation.component.TodoItem
 import com.example.todoapp.presentation.detail.TodoDetailViewModel
 
 
-class TodoDetailViewModelFactory(
-    private val repository: TodoRepository
-) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(TodoDetailViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return TodoDetailViewModel(repository) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
-    }
-}
+
 
 
 @OptIn(ExperimentalMaterial3Api::class)
